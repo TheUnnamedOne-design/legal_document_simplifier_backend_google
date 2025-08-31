@@ -6,11 +6,12 @@ def retrieve_and_rerank(query: str, top_k: int = 5) -> List[str]:
     query_emb = embedding_model.encode([query]).tolist()[0]
 
     results = collection.query(
-        query_embeddings=[query_emb],
-        n_results=top_k * 3
+        vector=query_emb,
+        top_k=top_k * 3,
+        include_metadata=True
     )
 
-    candidates = results["documents"][0]
+    candidates = [match['metadata']['text'] for match in results['matches']]
     scores = reranker.predict([(query, c) for c in candidates])
 
     reranked = sorted(zip(candidates, scores), key=lambda x: x[1], reverse=True)

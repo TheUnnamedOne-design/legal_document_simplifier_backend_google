@@ -11,11 +11,17 @@ def ingest_document(path: str, doc_id: str):
 
     embeddings = embedding_model.encode(chunks).tolist()
 
-    collection.add(
-        documents=chunks,
-        embeddings=embeddings,
-        ids=[f"{doc_id}_{i}" for i in range(len(chunks))]
-    )
+    # Pinecone upsert expects list of (id, vector, metadata)
+    vectors = [
+        {
+            "id": f"{doc_id}_{i}",
+            "values": emb,
+            "metadata": {"text": chunk}
+        }
+        for i, (emb, chunk) in enumerate(zip(embeddings, chunks))
+    ]
+    collection.upsert(vectors)
+
     print(f"✅ Document {doc_id} ingested with {len(chunks)} chunks.")
 
 
