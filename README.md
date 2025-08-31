@@ -22,8 +22,7 @@ legal-ai-backend/
 │   │   │── __init__.py
 │   │   │── legal.py            # API endpoints for uploading docs, querying, simplification, risk-check
 │
-│── env/
-│   │── .env                    # GEMINI_API_KEY and configs
+│── .env                        # GEMINI_API_KEY, PINECONE (KEY + REGION) and configs
 │
 │── requirements.txt            # Dependencies
 │── README.md                   # Documentation
