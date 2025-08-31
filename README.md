@@ -1,3 +1,4 @@
+```
 legal-ai-backend/
 │── app/
 │   │── __init__.py
@@ -27,3 +28,4 @@ legal-ai-backend/
 │── requirements.txt            # Dependencies
 │── README.md                   # Documentation
 │── .gitignore
+```
