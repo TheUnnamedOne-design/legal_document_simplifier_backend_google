@@ -13,7 +13,7 @@ legal-ai-backend/
 │   │   │── parser.py           # parse_pdf, parse_docx, parse_text, parse_document
 │   │   │── chunker.py          # chunk_text
 │   │   │── embeddings.py       # embedding_model, legal_model, reranker init
-│   │   │── database.py         # ChromaDB client & collection
+│   │   │── database.py         # Pinecone client & collection
 │   │   │── retrieval.py        # retrieve_and_rerank
 │   │   │── gemini_client.py    # genai.configure + Gemini wrapper
 │   │   │── legal_tasks.py      # ingest_document, simplify_clause, query_for_answer, risk_check

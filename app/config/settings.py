@@ -8,6 +8,6 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 CHROMA_DB_PATH = os.getenv("CHROMA_DB_PATH", "chroma_store")
 GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL", "models/gemini-pro")
 
-PINECONE_API_KEY = os.getenv("PINECONE_API_KEY", "your-pinecone-api-key-here")
-PINECONE_ENV = os.getenv("PINECONE_ENV", "your-pinecone-environment-here")
-PINECONE_INDEX_NAME = "googlegenai"
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+PINECONE_ENV = os.getenv("PINECONE_ENV")
+PINECONE_INDEX_NAME = "googlegenai2"
