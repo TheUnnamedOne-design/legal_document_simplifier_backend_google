@@ -1,22 +1,22 @@
 {
   "manifest_version": 3,
-  "name": "Mistral Fact Checker",
-  "version": "1.1.0",
-  "permissions": ["contextMenus", "scripting", "activeTab", "notifications"],
+  "name": "PDF Text Extractor",
+  "version": "1.0",
+  "permissions": ["scripting", "tabs"],
+  "host_permissions": ["http://localhost:3000/"],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "run_at": "document_idle"
+      "matches": ["*://*.arxiv.org/*", "file://*/*.pdf"],
+      "js": ["pdf.js", "content.js"]
     }
   ],
-  "icons": {
-    "16": "icon16.png",
-    "32": "icon32.png",
-    "48": "icon48.png",
-    "128": "icon128.png"
-  }
+  "web_accessible_resources": [
+    {
+      "resources": ["pdf.worker.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
