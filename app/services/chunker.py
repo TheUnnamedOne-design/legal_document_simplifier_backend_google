@@ -1,6 +1,6 @@
 from typing import List
 
-def chunk_text(text: str, chunk_size: int = 300, overlap: int = 50) -> List[str]:
+def chunk_text(text: str, chunk_size: int = 800, overlap: int = 100) -> List[str]:
     words = text.split()
     chunks, start = [], 0
     while start < len(words):

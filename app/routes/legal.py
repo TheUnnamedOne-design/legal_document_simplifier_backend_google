@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
-from app.services.legal_tasks import simplify_clause, query_for_answer, risk_check, ingest_document
+from app.services.legal_tasks import simplify_clause, query_for_answer, risk_check, ingest_document, summarize_document
+
 
 legal_bp = Blueprint("legal", __name__)
 
@@ -47,3 +48,23 @@ def ingest():
         return jsonify({"message": f"Document {doc_id} ingested successfully."})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+@legal_bp.route("/summarise_document",methods=["POST"])
+def summarise_document_route():
+    """
+    Expects JSON:
+    {
+        "path": "path/to/document.pdf",
+    }
+    """
+
+    data = request.json
+    path = data.get("path")
+
+    if not path:
+        return jsonify({"error": "'path' is required"}), 400
+    
+    summary = summarize_document(path)
+    
+    return jsonify({"Summary": summary})

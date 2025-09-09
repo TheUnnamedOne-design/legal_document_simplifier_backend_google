@@ -5,3 +5,6 @@ def generate_response(prompt: str, model_name: str = GEMINI_MODEL_NAME) -> str:
     model = genai.GenerativeModel(model_name)
     response = model.generate_content(prompt)
     return response.text
+
+
+    
