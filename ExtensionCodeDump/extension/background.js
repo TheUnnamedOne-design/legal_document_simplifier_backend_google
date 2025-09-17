@@ -7,8 +7,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: message.text })
     })
-      .then(res => res.text())
-      .then(data => console.log("✅ Backend response:", data))
-      .catch(err => console.error("❌ Backend error:", err));
+      .then(res => res.json())
+      .then(data => {
+        console.log("✅ Backend snippet:", data.snippet);
+        sendResponse({ snippet: data.snippet });
+      })
+      .catch(err => {
+        console.error("❌ Backend error:", err);
+        sendResponse({ error: err.toString() });
+      });
+
+    return true; // keep sendResponse async
   }
 });
