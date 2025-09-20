@@ -1,21 +1,21 @@
-from app.services.parser import parse_document
 from app.services.chunker import chunk_text
 from app.services.embeddings import embedding_model
 from app.services.database import collection
 from app.services.retrieval import retrieve_and_rerank
 from app.services.gemini_client import generate_response
 
-
 from typing import List, Dict, Any
 import re
 
 
-def ingest_document(path: str, doc_id: str):
+def ingest_document_from_content(content: str, doc_id: str):
+    """
+    Ingest document from text content instead of file path.
+    """
     # 🔥 Clear the index before adding new data
     collection.delete(delete_all=True)
 
-    text = parse_document(path)
-    chunks = chunk_text(text)
+    chunks = chunk_text(content)
     embeddings = embedding_model.encode(chunks).tolist()
 
     vectors = [
@@ -47,7 +47,6 @@ def simplify_clause(clause_query: str, doc_type: str = "contract") -> str:
     return generate_response(prompt)
 
 
-
 def query_for_answer(question: str, doc_type: str = "contract") -> str:
     retrieved_chunks = retrieve_and_rerank(question)
     context = "\n".join(retrieved_chunks)
@@ -64,7 +63,6 @@ def query_for_answer(question: str, doc_type: str = "contract") -> str:
     return generate_response(prompt, model_name="gemini-1.5-flash")
 
 
-
 def risk_check(doc_type: str = "contract") -> str:
     retrieved_chunks = retrieve_and_rerank("potential risks or penalties", top_k=8)
     context = "\n".join(retrieved_chunks)
@@ -79,7 +77,6 @@ def risk_check(doc_type: str = "contract") -> str:
     If no risks are found, say: "No significant risks detected."
     """
     return generate_response(prompt, model_name="gemini-1.5-flash")
-
 
 
 def split_by_headings(text: str) -> Dict[str, str]:
@@ -107,7 +104,6 @@ def split_by_headings(text: str) -> Dict[str, str]:
         sections[current_heading] = "\n".join(buffer).strip()
 
     return sections
-
 
 
 def simplify_summarize_section(title: str, text: str) -> str:
@@ -139,21 +135,20 @@ def simplify_summarize_section(title: str, text: str) -> str:
     ...
     """
     
-    response = generate_response(prompt,model_name="gemini-1.5-flash")
+    response = generate_response(prompt, model_name="gemini-1.5-flash")
     return response
 
 
-def summarize_document(path: str) -> Dict[str, str]:
+def summarize_document_from_content(content: str) -> Dict[str, str]:
     """
-    Parse document → split into sections → summarize each with Gemini.
+    Split document content into sections and summarize each with Gemini.
     Returns a dict {heading: bullets}
     """
-    text = parse_document(path)
-    sections = split_by_headings(text)
+    sections = split_by_headings(content)
 
     summaries = {}
-    for title, content in sections.items():
-        summary = summarize_section(title, content)
+    for title, section_content in sections.items():
+        summary = summarize_section(title, section_content)
         if summary and "No important points" not in summary:
             summaries[title] = summary
 
@@ -182,34 +177,5 @@ def summarize_section(title: str, text: str) -> str:
     ...
     """
 
-    response = generate_response(prompt,model_name="gemini-1.5-flash")
+    response = generate_response(prompt, model_name="gemini-1.5-flash")
     return response
-
-
-def split_by_headings(text: str) -> Dict[str, str]:
-    """
-    Split document text into sections based on headings.
-    Headings are assumed to be lines in ALL CAPS or numbered like 1., 2.1, etc.
-    """
-    sections = {}
-    current_heading = "Introduction"
-    buffer = []
-
-    lines = text.splitlines()
-    for line in lines:
-        line_stripped = line.strip()
-        # Detect headings (very simple heuristic)
-        if re.match(r"^(\d+(\.\d+)*)\s", line_stripped) or line_stripped.isupper():
-            # Save previous section
-            if buffer:
-                sections[current_heading] = "\n".join(buffer).strip()
-                buffer = []
-            current_heading = line_stripped
-        else:
-            buffer.append(line_stripped)
-
-    # Add last section
-    if buffer:
-        sections[current_heading] = "\n".join(buffer).strip()
-
-    return sections

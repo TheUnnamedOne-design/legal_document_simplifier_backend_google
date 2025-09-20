@@ -1,6 +1,14 @@
 from flask import Blueprint, request, jsonify
-from app.services.legal_tasks import simplify_clause, query_for_answer, risk_check, ingest_document, summarize_document
-
+from app.services.legal_tasks import (
+    simplify_clause, 
+    query_for_answer, 
+    risk_check, 
+    ingest_document_from_content, 
+    summarize_document_from_content
+)
+from app.services.parser import parse_document_from_content
+from werkzeug.utils import secure_filename
+import io
 
 legal_bp = Blueprint("legal", __name__)
 
@@ -25,46 +33,131 @@ def risk():
     risks = risk_check(text)
     return jsonify({"risks": risks})
 
-
-
 @legal_bp.route("/ingest", methods=["POST"])
 def ingest():
     """
-    Expects JSON:
+    Expects a file upload with form data:
+    - file: the document file (PDF, DOCX, or TXT)
+    - doc_id: unique identifier for the document
+    """
+    if 'file' not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+    
+    file = request.files['file']
+    doc_id = request.form.get('doc_id')
+    
+    if not doc_id:
+        return jsonify({"error": "'doc_id' is required"}), 400
+    
+    if file.filename == '':
+        return jsonify({"error": "No file selected"}), 400
+
+    try:
+        # Read file content
+        file_content = file.read()
+        filename = secure_filename(file.filename)
+        
+        # Parse document content based on file extension
+        text_content = parse_document_from_content(file_content, filename)
+        
+        # Ingest the document
+        ingest_document_from_content(text_content, doc_id)
+        
+        return jsonify({"message": f"Document {doc_id} ingested successfully."})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@legal_bp.route("/ingest_json", methods=["POST"])
+def ingest_json():
+    """
+    Alternative endpoint that accepts JSON with base64 encoded file content:
     {
-        "path": "path/to/document.pdf",
+        "file_content": "base64_encoded_content",
+        "filename": "document.pdf",
         "doc_id": "unique_id_for_document"
     }
     """
     data = request.json
-    path = data.get("path")
+    file_content_b64 = data.get("file_content")
+    filename = data.get("filename")
     doc_id = data.get("doc_id")
 
-    if not path or not doc_id:
-        return jsonify({"error": "Both 'path' and 'doc_id' are required"}), 400
+    if not all([file_content_b64, filename, doc_id]):
+        return jsonify({"error": "file_content, filename, and doc_id are all required"}), 400
 
     try:
-        ingest_document(path, doc_id)
+        import base64
+        file_content = base64.b64decode(file_content_b64)
+        
+        # Parse document content
+        text_content = parse_document_from_content(file_content, filename)
+        
+        # Ingest the document
+        ingest_document_from_content(text_content, doc_id)
+        
         return jsonify({"message": f"Document {doc_id} ingested successfully."})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
 
-@legal_bp.route("/summarise_document",methods=["POST"])
+@legal_bp.route("/summarise_document", methods=["POST"])
 def summarise_document_route():
     """
-    Expects JSON:
+    Expects a file upload:
+    - file: the document file (PDF, DOCX, or TXT)
+    """
+    if 'file' not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+    
+    file = request.files['file']
+    
+    if file.filename == '':
+        return jsonify({"error": "No file selected"}), 400
+
+    try:
+        # Read file content
+        file_content = file.read()
+        filename = secure_filename(file.filename)
+        
+        # Parse document content
+        print("Calling successfully1")
+        text_content = parse_document_from_content(file_content, filename)
+        # Summarize the document
+        print("Calling successfully2")
+        summary = summarize_document_from_content(text_content)
+        print("Calling successfully")
+        return jsonify({"Summary": summary}), 200
+    except Exception as e:
+        print("Calling unsuccessfully")
+        return jsonify({"error": str(e)}), 500
+    
+
+
+@legal_bp.route("/summarise_document_json", methods=["POST"])
+def summarise_document_json():
+    """
+    Alternative endpoint that accepts JSON with base64 encoded file content:
     {
-        "path": "path/to/document.pdf",
+        "file_content": "base64_encoded_content",
+        "filename": "document.pdf"
     }
     """
-
     data = request.json
-    path = data.get("path")
+    file_content_b64 = data.get("file_content")
+    filename = data.get("filename")
 
-    if not path:
-        return jsonify({"error": "'path' is required"}), 400
-    
-    summary = summarize_document(path)
-    
-    return jsonify({"Summary": summary})
+    if not file_content_b64 or not filename:
+        return jsonify({"error": "Both file_content and filename are required"}), 400
+
+    try:
+        import base64
+        file_content = base64.b64decode(file_content_b64)
+        
+        # Parse document content
+        text_content = parse_document_from_content(file_content, filename)
+        
+        # Summarize the document
+        summary = summarize_document_from_content(text_content)
+        
+        return jsonify({"Summary": summary})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
