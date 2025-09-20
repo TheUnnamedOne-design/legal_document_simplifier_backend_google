@@ -4,11 +4,16 @@ from app.services.legal_tasks import (
     query_for_answer, 
     risk_check, 
     ingest_document_from_content, 
-    summarize_document_from_content
+    summarize_document_from_content,
+    summarize_document_from_content2
 )
 from app.services.parser import parse_document_from_content
 from werkzeug.utils import secure_filename
 import io
+import re
+from typing import Dict, List, Tuple
+import google.generativeai as genai
+import time
 
 legal_bp = Blueprint("legal", __name__)
 
@@ -123,8 +128,8 @@ def summarise_document_route():
         text_content = parse_document_from_content(file_content, filename)
         # Summarize the document
         #print("Calling successfully2")
-        print(text_content)
-        summary = summarize_document_from_content(text_content)
+        #print(text_content)
+        summary = summarize_document_from_content2(text_content)
         #print("Calling successfully")
         return jsonify({"Summary": summary}), 200
     except Exception as e:
