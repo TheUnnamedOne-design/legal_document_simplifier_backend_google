@@ -2,20 +2,24 @@
   "manifest_version": 3,
   "name": "PDF Text Extractor",
   "version": "1.0",
-  "permissions": ["scripting", "tabs"],
+  "permissions": ["tabs", "scripting"],
   "host_permissions": ["http://localhost:3000/"],
   "background": {
     "service_worker": "background.js"
   },
+  "action": {
+    "default_popup": "viewer.html",
+    "default_title": "PDF Text Extractor"
+  },
   "content_scripts": [
     {
-      "matches": ["*://*.arxiv.org/*", "file://*/*.pdf"],
+      "matches": ["*://*/*.pdf", "file:///*/*.pdf", "*://*.arxiv.org/*"],
       "js": ["pdf.js", "content.js"]
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["pdf.worker.js"],
+      "resources": ["pdf.worker.js", "viewer.html", "viewer.js"],
       "matches": ["<all_urls>"]
     }
   ]
