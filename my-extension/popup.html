@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="container">
+        <h3>Legal PDF Summarizer</h3>
+        
+        <!-- File Upload Section for Local PDFs -->
+        <div id="uploadSection">
+            <label for="pdfFile">Upload Local PDF:</label>
+            <input type="file" id="pdfFile" accept=".pdf" />
+            <button id="uploadBtn" disabled>Upload & Analyze</button>
+            <div id="uploadStatus"></div>
+        </div>
+        
+        <hr>
+        
+        <!-- Summary Display -->
+        <div id="summary">No summary available yet. Open a PDF or upload one above.</div>
+        
+        <!-- Advanced Features Button -->
+        <button id="advancedBtn" disabled>Open Advanced Features</button>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>

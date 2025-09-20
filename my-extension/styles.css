@@ -1,0 +1,89 @@
+#container {
+  font-family: Arial, sans-serif;
+  padding: 10px;
+  width: 350px;
+}
+
+h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+#uploadSection {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+#uploadSection label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #555;
+}
+
+#pdfFile {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+#uploadStatus {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #666;
+  min-height: 16px;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 15px 0;
+}
+
+#summary {
+  margin-top: 10px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  background-color: #f5f5f5;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #e0e0e0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+button {
+  margin-top: 15px;
+  padding: 8px 12px;
+  border: none;
+  background: #0077cc;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 14px;
+}
+
+button:hover:not(:disabled) {
+  background: #005fa3;
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+#uploadBtn {
+  margin-top: 5px;
+  background: #28a745;
+}
+
+#uploadBtn:hover:not(:disabled) {
+  background: #218838;
+}
