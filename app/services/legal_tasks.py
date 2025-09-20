@@ -144,23 +144,28 @@ def summarize_document_from_content(content: str) -> Dict[str, str]:
     Split document content into sections and summarize each with Gemini.
     Returns a dict {heading: bullets}
     """
+    #print("DEBUG: Starting summarize_document_from_content")
     sections = split_by_headings(content)
+    #print(f"DEBUG: Sections extracted: {list(sections.keys())}")
 
     summaries = {}
     for title, section_content in sections.items():
-        summary = summarize_section(title, section_content)
-        if summary and "No important points" not in summary:
-            summaries[title] = summary
+        #print(f"DEBUG: Summarizing section '{title}' (length: {len(section_content)} characters)")
+        try:
+            summary = summarize_section(title, section_content)
+            #print(f"DEBUG: Summary for '{title}': {summary[:50]}...")  # print first 50 chars
+            if summary and "No important points" not in summary:
+                summaries[title] = summary
+        except Exception as e:
+            #print(f"ERROR: Failed to summarize section '{title}': {e}")
+            summaries[title] = "Error generating summary for this section."
 
+    #print(f"DEBUG: Total summaries generated: {len(summaries)}")
     return summaries
 
-
 def summarize_section(title: str, text: str) -> str:
-    """
-    Summarize one section into bullet points (if relevant).
-    Skips if section is empty or trivial.
-    """
-    if not text.strip() or len(text.split()) < 20:  # skip too short sections
+    if not text.strip() or len(text.split()) < 20:
+        #print(f"DEBUG: Skipping short or empty section '{title}'")
         return ""
 
     prompt = f"""
@@ -176,6 +181,17 @@ def summarize_section(title: str, text: str) -> str:
     - point 2
     ...
     """
+
+    #print(f"DEBUG: Prompt prepared for section '{title}' (length {len(prompt)} chars)")
+
+    try:
+        summary = generate_response(prompt)  # your Gemini API call
+        #print(f"DEBUG: Summary received for section '{title}': {summary[:50]}...")
+        return summary
+    except Exception as e:
+        #print(f"ERROR: Failed to summarize section '{title}': {e}")
+        return "Error generating summary for this section."
+
 
     response = generate_response(prompt, model_name="gemini-1.5-flash")
     return response
