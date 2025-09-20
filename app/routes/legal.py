@@ -119,12 +119,13 @@ def summarise_document_route():
         filename = secure_filename(file.filename)
         
         # Parse document content
-        print("Calling successfully1")
+        #print("Calling successfully1")
         text_content = parse_document_from_content(file_content, filename)
         # Summarize the document
-        print("Calling successfully2")
+        #print("Calling successfully2")
+        print(text_content)
         summary = summarize_document_from_content(text_content)
-        print("Calling successfully")
+        #print("Calling successfully")
         return jsonify({"Summary": summary}), 200
     except Exception as e:
         print("Calling unsuccessfully")
