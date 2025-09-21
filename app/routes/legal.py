@@ -44,6 +44,8 @@ def ingest():
     Expects a file upload with form data:
     - file: the document file (PDF, DOCX, or TXT)
     - doc_id: unique identifier for the document
+    
+    Returns the extracted text content along with success message
     """
     if 'file' not in request.files:
         return jsonify({"error": "No file provided"}), 400
@@ -68,9 +70,18 @@ def ingest():
         # Ingest the document
         ingest_document_from_content(text_content, doc_id)
         
-        return jsonify({"message": f"Document {doc_id} ingested successfully."})
+        # Return success message along with extracted text content
+        return jsonify({
+            "message": f"Document {doc_id} ingested successfully.",
+            "doc_id": doc_id,
+            "filename": filename,
+            "text_content": text_content,
+            "content_length": len(text_content)
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
 
 @legal_bp.route("/ingest_json", methods=["POST"])
 def ingest_json():
@@ -81,6 +92,8 @@ def ingest_json():
         "filename": "document.pdf",
         "doc_id": "unique_id_for_document"
     }
+    
+    Returns the extracted text content along with success message
     """
     data = request.json
     file_content_b64 = data.get("file_content")
@@ -100,9 +113,19 @@ def ingest_json():
         # Ingest the document
         ingest_document_from_content(text_content, doc_id)
         
-        return jsonify({"message": f"Document {doc_id} ingested successfully."})
+        # Return success message along with extracted text content
+        return jsonify({
+            "message": f"Document {doc_id} ingested successfully.",
+            "doc_id": doc_id,
+            "filename": filename,
+            "text_content": text_content,
+            "content_length": len(text_content)
+        })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+    
 
 @legal_bp.route("/summarise_document", methods=["POST"])
 def summarise_document_route():
