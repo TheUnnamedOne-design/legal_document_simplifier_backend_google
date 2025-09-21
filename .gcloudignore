@@ -1,0 +1,8 @@
+# Ignore virtual environments and local files
+.venv/
+venv2/
+__pycache__/
+*.pyc
+*.pkl
+*.csv
+*.ipynb
